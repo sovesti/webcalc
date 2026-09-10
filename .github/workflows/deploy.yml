@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.6
+        with:
+          target: x86_64-unknown-linux-gnu
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Dioxus
+        run: cargo install dioxus-cli
+      - name: Bundle project
+        run: dx bundle --release --server --out-dir dist --bin webcalc-server
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: webcalc-server
+          path: dist/webcalc-server
+  deploy-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Dioxus Deploy"
+        uses: DioxusLabs/deploy-action@0.1.2
+  deploy-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-pc-windows-msvc
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: webcalc-x86_64-pc-windows-msvc.zip
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.6
+        with:
+          target: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Dioxus
+        run: cargo install dioxus-cli
+      - name: Bundle project
+        run: dx bundle --release --desktop --package-types "msi"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.name }}
+          path: dist\bundle

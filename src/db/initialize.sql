@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS account(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL UNIQUE,
+  password VARCHAR NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS account_permission(
+  account INT NOT NULL PRIMARY KEY,
+  permission VARCHAR NOT NULL
+);
