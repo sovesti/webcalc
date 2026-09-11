@@ -18,17 +18,30 @@ jobs:
       - name: Install Dioxus
         run: cargo install dioxus-cli
       - name: Bundle project
-        run: dx bundle --release --server --out-dir dist --bin webcalc-server
+        run: dx bundle --release --server --out-dir dist
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: webcalc-server
-          path: dist/webcalc-server
+          path: dist/webcalc
   deploy-web:
     runs-on: ubuntu-latest
     steps:
-      - name: "Dioxus Deploy"
-        uses: DioxusLabs/deploy-action@0.1.2
+      - uses: actions/checkout@v7
+      - uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+          target: x86_64-unknown-linux-gnu
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Dioxus
+        run: cargo install dioxus-cli
+      - name: Build project
+        run: dx bundle --release --out-dir dist
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: webcalc-web
+          path: dist
   deploy-desktop:
     strategy:
       fail-fast: false
@@ -38,8 +51,6 @@ jobs:
         include:
           - target: x86_64-pc-windows-msvc
             toolchain: stable
-            os: windows-latest
-            name: webcalc-x86_64-pc-windows-msvc.zip
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
@@ -55,5 +66,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.name }}
-          path: dist\bundle
+          archive: false
+          name: webcalc-x86_64-windows.msi
+          path: dist\bundle\*.msi

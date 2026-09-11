@@ -8,7 +8,10 @@ mod user;
 
 fn main() {
     #[cfg(not(feature = "server"))]
-    dioxus::launch(crate::ui::app);
+    {
+        dioxus::fullstack::set_server_url("http://178.250.240.28");
+        dioxus::launch(crate::ui::app);
+    }
     #[cfg(feature = "server")]
     dioxus::serve(crate::backend::router);
 }
