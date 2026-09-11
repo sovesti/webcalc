@@ -3,7 +3,7 @@ name: Check
 on:
   push:
     branches-ignore:
-      - main
+      - master
 
 jobs:
   build-all:
@@ -33,4 +33,4 @@ jobs:
           target: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@v2
       - name: Check project
-        run: cargo check --features ${{ matrix.server }}
+        run: cargo check --features ${{ matrix.feature }}
