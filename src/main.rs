@@ -9,7 +9,9 @@ mod user;
 fn main() {
     #[cfg(not(feature = "server"))]
     {
-        dioxus::fullstack::set_server_url("http://178.250.240.28");
+        if let Some(host) = option_env!("WEBCALC_HOST") {
+            dioxus::fullstack::set_server_url(host);
+        }
         dioxus::launch(crate::ui::app);
     }
     #[cfg(feature = "server")]
