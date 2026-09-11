@@ -62,7 +62,7 @@ jobs:
       - name: Install Dioxus
         run: cargo install dioxus-cli
       - name: Bundle project
-        run: dx bundle --release --desktop --package-types "msi"
+        run: dx bundle --release --desktop --package-types "msi" --out-dir dist\bundle
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
