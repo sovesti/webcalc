@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - master
-
+env:
+  WEBCALC_HOST: ${{ vars.WEBCALC_HOST }}
 jobs:
   deploy-server:
     runs-on: ubuntu-latest
