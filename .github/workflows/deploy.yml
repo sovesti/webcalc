@@ -37,7 +37,7 @@ jobs:
       - name: Install Dioxus
         run: cargo install dioxus-cli
       - name: Build project
-        run: dx bundle --release --out-dir dist
+        run: dx bundle --web --release --out-dir dist
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
