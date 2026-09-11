@@ -20,7 +20,7 @@ jobs:
       - name: Bundle project
         run: dx bundle --release --server --out-dir dist --bin webcalc-server
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: webcalc-server
           path: dist/webcalc-server
@@ -53,7 +53,7 @@ jobs:
       - name: Bundle project
         run: dx bundle --release --desktop --package-types "msi"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.name }}
           path: dist\bundle
