@@ -8,10 +8,15 @@ use crate::ui::{auth::AuthView, eval::EvalView};
 pub fn app() -> Element {
     let authorized = use_signal(|| false);
     rsx! {
-        if authorized() {
-            EvalView {},
-        } else {
-            AuthView { authorized }
+        document::Link { rel: "icon", href: asset!("/assets/favicon.ico") },
+        Stylesheet { href: asset!("/assets/tailwind.css") },
+        main {
+            class: "w-80",
+            if authorized() {
+                EvalView {},
+            } else {
+                AuthView { authorized }
+            }
         }
     }
 }

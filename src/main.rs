@@ -1,7 +1,5 @@
 #[cfg(feature = "server")]
 mod backend;
-#[allow(clippy::all, warnings)]
-mod components;
 #[cfg(feature = "server")]
 mod db;
 mod eval;

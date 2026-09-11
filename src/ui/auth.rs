@@ -1,44 +1,37 @@
 use dioxus::prelude::*;
 
-use crate::{
-    components::{
-        button::{Button, ButtonVariant},
-        input::Input,
-        tabs::{TabContent, TabList, TabTrigger, Tabs},
-    },
-    user::api::sign_in,
-};
+use crate::user::api::sign_in;
+
+#[derive(PartialEq)]
+enum Tab {
+    SignIn,
+    SignUp,
+}
 
 #[component]
 pub fn AuthView(authorized: Signal<bool>) -> Element {
+    let mut tab = use_signal(|| Tab::SignIn);
     rsx! {
-        Tabs {
-            default_value: "sign_in".to_owned(),
-            class: "dx-tabs",
-            TabList {
-                class: "dx-tab-list",
-                TabTrigger {
-                    class: "dx-tab-trigger",
-                    index: 0usize,
-                    value: "sign_in",
+        div {
+            class: "flex flex-col",
+            div {
+                class: "flex flex-row",
+                button {
+                    class: "rounded-xl m-1 p-2 hover:bg-slate-200",
+                    class: if *tab.read() == Tab::SignIn { "bg-slate-100" },
+                    onclick: move |_| tab.set(Tab::SignIn),
                     "Sign in"
                 },
-                TabTrigger {
-                    class: "dx-tab-trigger",
-                    index: 1usize,
-                    value: "sign_up",
+                button {
+                    class: "rounded-xl m-1 p-2 hover:bg-slate-200",
+                    class: if *tab.read() == Tab::SignUp { "bg-slate-100" },
+                    onclick: move |_| tab.set(Tab::SignUp),
                     "Sign up"
                 }
-            },
-            TabContent {
-                index: 0usize,
-                value: "sign_in",
-                SignInForm { authorized }
-            },
-            TabContent {
-                index: 1usize,
-                value: "sign_up",
-                SignUpForm { authorized }
+            }
+            match *tab.read() {
+                Tab::SignIn => rsx! { SignInForm { authorized } },
+                Tab::SignUp => rsx! { SignUpForm { authorized } },
             }
         }
     }
@@ -51,23 +44,22 @@ fn SignInForm(authorized: Signal<bool>) -> Element {
     let mut signin = use_action(move || try_sign_in(username, password, authorized));
     rsx! {
         div {
-            class: "flex-1 flex-col",
-            Input {
-                class: "dx-input",
+            class: "flex flex-col",
+            input {
+                class: "flex-1 m-1 p-2",
                 oninput: move |e: FormEvent| username.set(e.value()),
                 placeholder: "Name",
                 value: username
             },
-            Input {
-                class: "dx-input",
+            input {
+                class: "flex-1 m-1 p-2",
                 oninput: move |e: FormEvent| password.set(e.value()),
                 placeholder: "Password",
                 type: "password",
                 value: password
             },
-            Button {
-                class: "dx-button",
-                variant: ButtonVariant::Outline,
+            button {
+                class: "rounded-xl m-1 p-2 hover:bg-slate-200",
                 onclick: move |_| signin.call(),
                 "Sign in"
             },
