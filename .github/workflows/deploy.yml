@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: webcalc-server
-          path: dist/webcalc
+          path: dist/web
   deploy-web:
     runs-on: ubuntu-latest
     steps:
