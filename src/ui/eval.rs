@@ -61,7 +61,6 @@ fn ExpressionView() -> Element {
 #[component]
 fn HistoryView() -> Element {
     let mut fetch = use_action(eval_history);
-    fetch.call();
     rsx! {
         div {
             button {
