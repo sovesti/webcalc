@@ -187,8 +187,14 @@
   .m-1 {
     margin: calc(var(--spacing) * 1);
   }
+  .m-3 {
+    margin: calc(var(--spacing) * 3);
+  }
   .flex {
     display: flex;
+  }
+  .table {
+    display: table;
   }
   .w-80 {
     width: calc(var(--spacing) * 80);

@@ -15,6 +15,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "server", derive(sqlx::FromRow))]
 pub struct EvaluatedExpression {
-    expression: String,
-    result: String,
+    pub expression: String,
+    pub result: String,
 }

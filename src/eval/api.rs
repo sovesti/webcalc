@@ -20,7 +20,7 @@ pub struct EvalResponse {
     pub result: String,
 }
 
-#[post("/eval", auth: AxumSession, Extension(users): Extension<DynUsers>)]
+#[post("/eval", auth: AxumSession, Extension(users): Extension<DynUsers>, Extension(expressions): Extension<DynExpressions>)]
 pub async fn eval_expr(expression: String) -> Result<EvalResponse> {
     check_permission(&users, Method::POST, Permission::default(), &auth)
         .await
@@ -28,12 +28,21 @@ pub async fn eval_expr(expression: String) -> Result<EvalResponse> {
     let result = evaluate_expression(&expression)
         .map_err(|error| HttpError::new(StatusCode::BAD_REQUEST, error.to_string()))?
         .to_string();
+    record_expression(auth.id, expression, result.clone(), expressions).await?;
     Ok(EvalResponse { result })
 }
 
-#[derive(Deserialize, Serialize, Debug)]
-pub struct HistoryResponse {
-    entries: Vec<EvaluatedExpression>,
+#[cfg(feature = "server")]
+async fn record_expression(
+    id: i32,
+    expression: String,
+    result: String,
+    expressions: DynExpressions,
+) -> Result<()> {
+    expressions
+        .add_expression(id, EvaluatedExpression { expression, result })
+        .await?;
+    Ok(())
 }
 
 #[get("/eval", auth: AxumSession, expressions: Extension<DynExpressions>)]
