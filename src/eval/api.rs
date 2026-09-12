@@ -32,6 +32,7 @@ pub async fn eval_expr(expression: String) -> Result<EvalResponse> {
     Ok(EvalResponse { result })
 }
 
+#[cfg(feature = "server")]
 async fn record_expression(
     id: i32,
     expression: String,
