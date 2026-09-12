@@ -2,5 +2,5 @@
 host = "localhost"
 port = 5432
 user = "postgres"
-password = "2371"
-database = "cocalc"
+password = "postgres password here"
+database = "webcalc"
