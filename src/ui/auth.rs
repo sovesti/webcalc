@@ -1,3 +1,4 @@
+use dioxus::CapturedError;
 use dioxus::prelude::*;
 
 use crate::user::api::{sign_in, sign_up};
@@ -6,6 +7,15 @@ use crate::user::api::{sign_in, sign_up};
 enum Tab {
     SignIn,
     SignUp,
+}
+
+/// Renders an action's `CapturedError` as a plain message for the user, without
+/// the "error running server function: ... (details: ...)" wrapping.
+fn readable_error(err: &CapturedError) -> String {
+    match err.0.downcast_ref::<ServerFnError>() {
+        Some(ServerFnError::ServerError { message, .. }) => message.clone(),
+        _ => "Something went wrong, please try again".to_owned(),
+    }
 }
 
 #[component]
@@ -64,7 +74,7 @@ fn SignInForm(authorized: Signal<bool>) -> Element {
                 "Sign in"
             },
             if let Some(Err(err)) = signin.value() {
-                p { "{err}" }
+                p { "{readable_error(&err)}" }
             },
             if signin.pending() {
                 p { "Checking..." }
@@ -110,7 +120,7 @@ fn SignUpForm(authorized: Signal<bool>) -> Element {
                 "Sign up"
             },
             if let Some(Err(err)) = signup.value() {
-                p { "{err}" }
+                p { "{readable_error(&err)}" }
             },
             if signup.pending() {
                 p { "Registering..." }
