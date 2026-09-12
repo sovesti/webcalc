@@ -1,10 +1,10 @@
 #[cfg(feature = "server")]
-mod backend;
+pub mod backend;
 #[cfg(feature = "server")]
 mod db;
-mod eval;
+pub mod eval;
 mod ui;
-mod user;
+pub mod user;
 
 fn main() {
     #[cfg(not(feature = "server"))]

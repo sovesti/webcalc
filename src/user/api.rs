@@ -33,49 +33,66 @@ pub async fn user_name() -> Result<String> {
     Ok(users.find(auth.id).await?.name().to_owned())
 }
 
-#[cfg(all(test, feature = "server"))]
-mod tests {
-    use std::sync::Arc;
-
-    use axum::{Extension, Router};
-    use axum_test::TestServer;
-    use dioxus::server::{DioxusRouterExt, FullstackState};
-    use tokio::sync::Mutex;
-
-    use crate::user::users::{DynUsers, test::FakeUsers};
-
-    #[derive(serde::Serialize)]
-    struct SignUpBody {
-        username: String,
-        password: String,
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+    use async_trait::async_trait;       
+    use axum_test::{TestServer, TestResponse};
+    use serde_json::{json, to_value};
+    use crate::backend::tests::Response;
+    
+    pub trait UsernameResponse : Response {
+        fn assert_exact(&self, value: &str);
     }
 
-    fn test_server(fake: Arc<Mutex<FakeUsers>>) -> TestServer {
-        let users: DynUsers = Arc::new(fake);
-        let router = Router::<FullstackState>::new()
-            .register_server_functions()
-            .layer(Extension(users))
-            .with_state(FullstackState::headless());
-        TestServer::new(router)
+    #[async_trait]
+    impl UsernameResponse for TestResponse {
+        fn assert_exact(&self, value: &str) {
+            self
+                .assert_status_ok()
+                .assert_json(&json!({"username": value}));
+        }
     }
 
-    #[tokio::test]
-    async fn sign_up_registers_a_new_user() {
-        let fake = Arc::new(Mutex::new(FakeUsers::default()));
-        let server = test_server(fake.clone());
+    #[async_trait]
+    pub trait Api {
+        async fn sign_up(&self, username: &str, password: &str) -> impl Response;
 
-        let response = server
-            .post("/user/signup")
-            .json(&SignUpBody {
-                username: "alice".to_owned(),
-                password: "hunter2".to_owned(),
-            })
-            .await;
+        async fn sign_in(&self, username: &str, password: &str) -> impl Response;
 
-        response.assert_status_ok();
+        async fn sign_out(&self) -> impl Response;
 
-        let users = &fake.lock().await.users;
-        assert_eq!(users.len(), 1);
-        assert_eq!(users[0].name(), "alice");
+        async fn user_name(&self) -> impl UsernameResponse;
+    }
+
+    #[async_trait]
+    impl Api for TestServer {
+        async fn sign_in(&self, username: &str, password: &str) -> impl Response {
+            self
+                .post("/user/signin")
+                .json(&json! ({
+                    "username": username,
+                    "password": password
+                }))
+                .await
+        }
+        
+        async fn sign_up(&self, username: &str, password: &str) -> impl Response {
+            self
+                .post("/user/signup")
+                .json(&json! ({
+                    "username": username,
+                    "password": password
+                }))
+                .await
+        }
+
+        async fn sign_out(&self) -> impl Response {
+            self.post("/user/signout").await
+        }
+
+        async fn user_name(&self) -> impl UsernameResponse {
+            self.get("/user/name").await
+        }
     }
 }

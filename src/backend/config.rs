@@ -23,7 +23,8 @@ impl Config {
 }
 
 fn config_path() -> anyhow::Result<String> {
-    let path = env::args().nth(1).unwrap_or("config.toml".to_owned());
+    let path = "config.toml".to_owned();//env::args().nth(1).unwrap_or("config.toml".to_owned());
+    println!("{} {}", env::current_dir().unwrap().display(), &path);
     ensure!(
         exists(&path).is_ok_and(|exists| exists),
         "Config file not found at {path}"
