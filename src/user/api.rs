@@ -21,13 +21,61 @@ pub async fn sign_out() -> Result<()> {
     Ok(())
 }
 
-#[post("/user/signup")]
-pub async fn sign_up() -> Result<()> {
-    todo!()
+#[post("/user/signup", Extension(users): Extension<DynUsers>)]
+pub async fn sign_up(username: String, password: String) -> Result<()> {
+    users.sign_up(username, password).await?;
+    Ok(())
 }
 
 #[get("/user/name", auth: AxumSession, Extension(users): Extension<DynUsers>)]
 pub async fn user_name() -> Result<String> {
     check_permission(&users, Method::GET, Permission::default(), &auth).await?;
     Ok(users.find(auth.id).await?.name().to_owned())
+}
+
+#[cfg(all(test, feature = "server"))]
+mod tests {
+    use std::sync::Arc;
+
+    use axum::{Extension, Router};
+    use axum_test::TestServer;
+    use dioxus::server::{DioxusRouterExt, FullstackState};
+    use tokio::sync::Mutex;
+
+    use crate::user::users::{DynUsers, test::FakeUsers};
+
+    #[derive(serde::Serialize)]
+    struct SignUpBody {
+        username: String,
+        password: String,
+    }
+
+    fn test_server(fake: Arc<Mutex<FakeUsers>>) -> TestServer {
+        let users: DynUsers = Arc::new(fake);
+        let router = Router::<FullstackState>::new()
+            .register_server_functions()
+            .layer(Extension(users))
+            .with_state(FullstackState::headless());
+        TestServer::new(router)
+    }
+
+    #[tokio::test]
+    async fn sign_up_registers_a_new_user() {
+        let fake = Arc::new(Mutex::new(FakeUsers::default()));
+        let server = test_server(fake.clone());
+
+        let response = server
+            .post("/user/signup")
+            .json(&SignUpBody {
+                username: "alice".to_owned(),
+                password: "hunter2".to_owned(),
+            })
+            .await;
+
+        response.assert_status_ok();
+
+        let users = &fake.lock().await.users;
+        assert_eq!(users.len(), 1);
+        assert_eq!(users[0].name(), "alice");
+    }
 }
