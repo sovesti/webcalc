@@ -24,5 +24,5 @@ pub struct HistoryResponse {
 
 #[get("/eval", auth: AxumSession, expressions: Extension<DynExpressions>)]
 pub async fn eval_history() -> Result<Vec<EvaluatedExpression>> {
-    todo!()
+    Ok(expressions.history(auth.id).await?)
 }
