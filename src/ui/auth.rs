@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::user::api::sign_in;
+use crate::user::api::{sign_in, sign_up};
 
 #[derive(PartialEq)]
 enum Tab {
@@ -85,9 +85,45 @@ async fn try_sign_in(
 
 #[component]
 fn SignUpForm(authorized: Signal<bool>) -> Element {
+    let mut username = use_signal(String::new);
+    let mut password = use_signal(String::new);
+    let mut signup = use_action(move || try_sign_up(username, password, authorized));
     rsx! {
-        p {
-            "TODO: Sign up"
+        div {
+            class: "flex flex-col",
+            input {
+                class: "flex-1 m-1 p-2",
+                oninput: move |e: FormEvent| username.set(e.value()),
+                placeholder: "Name",
+                value: username
+            },
+            input {
+                class: "flex-1 m-1 p-2",
+                oninput: move |e: FormEvent| password.set(e.value()),
+                placeholder: "Password",
+                type: "password",
+                value: password
+            },
+            button {
+                class: "rounded-xl m-1 p-2 hover:bg-slate-200",
+                onclick: move |_| signup.call(),
+                "Sign up"
+            },
+            if let Some(Err(err)) = signup.value() {
+                p { "{err}" }
+            },
+            if signup.pending() {
+                p { "Registering..." }
+            }
         }
     }
+}
+
+async fn try_sign_up(
+    username: Signal<String>,
+    password: Signal<String>,
+    authorized: Signal<bool>,
+) -> Result<()> {
+    sign_up(username.to_string(), password.to_string()).await?;
+    try_sign_in(username, password, authorized).await
 }
