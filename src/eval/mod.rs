@@ -1,6 +1,12 @@
 pub(crate) mod api;
+#[cfg(any(feature = "server", test))]
+mod evaluator;
 #[cfg(feature = "server")]
 pub(crate) mod expressions;
+#[cfg(any(feature = "server", test))]
+mod lexer;
+#[cfg(any(feature = "server", test))]
+mod parser;
 
 use std::fmt::Debug;
 

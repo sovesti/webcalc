@@ -1,20 +1,34 @@
 #[cfg(feature = "server")]
-use axum::Extension;
+use crate::user::{auth::check_permission, permission::Permission, users::DynUsers};
+#[cfg(feature = "server")]
+use axum::{
+    Extension,
+    http::{Method, StatusCode},
+};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::eval::EvaluatedExpression;
 #[cfg(feature = "server")]
-use crate::{eval::expressions::DynExpressions, user::auth::AxumSession};
+use crate::{
+    eval::{evaluator::evaluate_expression, expressions::DynExpressions},
+    user::auth::AxumSession,
+};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct EvalResponse {
-    result: String,
+    pub result: String,
 }
 
-#[post("/eval", auth: AxumSession, expressions: Extension<DynExpressions>)]
-pub async fn eval_expr(expression: String) -> Result<()> {
-    todo!()
+#[post("/eval", auth: AxumSession, Extension(users): Extension<DynUsers>)]
+pub async fn eval_expr(expression: String) -> Result<EvalResponse> {
+    check_permission(&users, Method::POST, Permission::default(), &auth)
+        .await
+        .or_forbidden("Permission denied")?;
+    let result = evaluate_expression(&expression)
+        .map_err(|error| HttpError::new(StatusCode::BAD_REQUEST, error.to_string()))?
+        .to_string();
+    Ok(EvalResponse { result })
 }
 
 #[derive(Deserialize, Serialize, Debug)]
