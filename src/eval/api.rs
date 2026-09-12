@@ -20,7 +20,7 @@ pub struct EvalResponse {
     pub result: String,
 }
 
-#[post("/eval", auth: AxumSession, Extension(users): Extension<DynUsers>)]
+#[post("/eval", auth: AxumSession, Extension(users): Extension<DynUsers>, expressions: Extension<DynExpressions>)]
 pub async fn eval_expr(expression: String) -> Result<EvalResponse> {
     check_permission(&users, Method::POST, Permission::default(), &auth)
         .await
@@ -28,6 +28,15 @@ pub async fn eval_expr(expression: String) -> Result<EvalResponse> {
     let result = evaluate_expression(&expression)
         .map_err(|error| HttpError::new(StatusCode::BAD_REQUEST, error.to_string()))?
         .to_string();
+    expressions
+        .add_expression(
+            auth.id,
+            EvaluatedExpression {
+                expression,
+                result: result.clone(),
+            },
+        )
+        .await?;
     Ok(EvalResponse { result })
 }
 
