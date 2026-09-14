@@ -43,6 +43,7 @@ jobs:
         with:
           name: webcalc-web
           path: dist
+  # win msi
   deploy-desktop:
     strategy:
       fail-fast: false
@@ -70,3 +71,39 @@ jobs:
           archive: false
           name: webcalc-x86_64-windows.msi
           path: dist\bundle\*.msi
+  # linux (for fedora and ubuntu)
+  deploy-desktop-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+          target: x86_64-unknown-linux-gnu
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Install Dioxus
+        run: cargo install dioxus-cli --version 0.7.10 --locked
+
+      - name: Bundle Linux AppImage
+        run: dx bundle --release --desktop --package-types "appimage" --out-dir dist/bundle
+
+      - name: Upload Linux AppImage
+        uses: actions/upload-artifact@v7
+        with:
+          name: webcalc-x86_64-linux
+          path: dist/bundle/**/*.AppImage
+          if-no-files-found: error
