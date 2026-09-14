@@ -73,7 +73,21 @@ jobs:
           path: dist\bundle\*.msi
   # linux (for fedora and ubuntu)
   deploy-desktop-linux:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package_type: deb
+            distro: ubuntu
+            artifact_name: webcalc-x86_64-ubuntu
+            artifact_path: dist/bundle/**/*.deb
+
+          - package_type: rpm
+            distro: fedora
+            artifact_name: webcalc-x86_64-fedora
+            artifact_path: dist/bundle/**/*.rpm
+
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v7
@@ -90,20 +104,32 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
             libxdo-dev \
             libssl-dev \
             libayatana-appindicator3-dev \
-            librsvg2-dev
+            librsvg2-dev \
+            lld \
+            rpm
 
       - name: Install Dioxus
         run: cargo install dioxus-cli --version 0.7.10 --locked
 
-      - name: Bundle Linux AppImage
-        run: dx bundle --release --desktop --package-types "appimage" --out-dir dist/bundle
+      - name: Bundle ${{ matrix.distro }} installer
+        run: >
+          dx bundle
+          --release
+          --desktop
+          --package-types "${{ matrix.package_type }}"
+          --out-dir dist/bundle
 
-      - name: Upload Linux AppImage
+      - name: Upload ${{ matrix.distro }} installer
         uses: actions/upload-artifact@v7
         with:
-          name: webcalc-x86_64-linux
-          path: dist/bundle/**/*.AppImage
+          archive: false
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
           if-no-files-found: error
