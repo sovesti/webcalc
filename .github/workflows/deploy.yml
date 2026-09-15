@@ -100,7 +100,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           cache-bin: false
-          key: linux-bundle-${{ matrix.package_type }}-ubuntu22
+
+      - name: Cache Dioxus CLI
+        id: cache-dioxus
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/dx
+          key: dioxus-cli-0.7.10-ubuntu-22.04-x86_64
 
       - name: Install Linux dependencies
         run: |
@@ -119,14 +125,11 @@ jobs:
             lld \
             rpm
 
-      - name: Install Dioxus CLI from source
-        shell: bash
-        run: |
-          rm -f "$HOME/.cargo/bin/dx"
-          cargo install dioxus-cli --version 0.7.10 --locked --force
-          dx --version
+      - name: Install Dioxus
+        if: steps.cache-dioxus.outputs.cache-hit != 'true'
+        run: cargo install dioxus-cli --version 0.7.10 --locked
 
-      - name: Bundle ${{ matrix.distro }} installer
+      - name: Bundle ${{ matrix.distro }}
         run: >
           dx bundle
           --release
@@ -134,9 +137,10 @@ jobs:
           --package-types "${{ matrix.package_type }}"
           --out-dir dist/bundle
 
-      - name: Upload ${{ matrix.distro }} installer
+      - name: Upload ${{ matrix.distro }}
         uses: actions/upload-artifact@v7
         with:
+          archive: false
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_path }}
           if-no-files-found: error
