@@ -98,6 +98,15 @@ jobs:
           target: x86_64-unknown-linux-gnu
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Cache Dioxus CLI
+        id: cache-dioxus
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/dx
+          key: dioxus-cli-0.7.10-ubuntu-22.04-x86_64
 
       - name: Install Linux dependencies
         run: |
@@ -105,6 +114,7 @@ jobs:
           sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
             build-essential \
+            pkg-config \
             curl \
             wget \
             file \
@@ -116,9 +126,10 @@ jobs:
             rpm
 
       - name: Install Dioxus
+        if: steps.cache-dioxus.outputs.cache-hit != 'true'
         run: cargo install dioxus-cli --version 0.7.10 --locked
 
-      - name: Bundle ${{ matrix.distro }} installer
+      - name: Bundle ${{ matrix.distro }}
         run: >
           dx bundle
           --release
@@ -126,7 +137,7 @@ jobs:
           --package-types "${{ matrix.package_type }}"
           --out-dir dist/bundle
 
-      - name: Upload ${{ matrix.distro }} installer
+      - name: Upload ${{ matrix.distro }}
         uses: actions/upload-artifact@v7
         with:
           archive: false
