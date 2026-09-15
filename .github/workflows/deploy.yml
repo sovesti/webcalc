@@ -98,6 +98,9 @@ jobs:
           target: x86_64-unknown-linux-gnu
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+          key: linux-bundle-${{ matrix.package_type }}-ubuntu22
 
       - name: Install Linux dependencies
         run: |
@@ -105,6 +108,7 @@ jobs:
           sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
             build-essential \
+            pkg-config \
             curl \
             wget \
             file \
@@ -115,8 +119,12 @@ jobs:
             lld \
             rpm
 
-      - name: Install Dioxus
-        run: cargo install dioxus-cli --version 0.7.10 --locked
+      - name: Install Dioxus CLI from source
+        shell: bash
+        run: |
+          rm -f "$HOME/.cargo/bin/dx"
+          cargo install dioxus-cli --version 0.7.10 --locked --force
+          dx --version
 
       - name: Bundle ${{ matrix.distro }} installer
         run: >
@@ -129,7 +137,6 @@ jobs:
       - name: Upload ${{ matrix.distro }} installer
         uses: actions/upload-artifact@v7
         with:
-          archive: false
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_path }}
           if-no-files-found: error
