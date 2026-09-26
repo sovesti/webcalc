@@ -11,11 +11,14 @@ pub fn app() -> Element {
         document::Link { rel: "icon", href: asset!("/assets/favicon.ico") },
         Stylesheet { href: asset!("/assets/tailwind.css") },
         main {
-            class: "w-80",
-            if authorized() {
-                EvalView {},
-            } else {
-                AuthView { authorized }
+            class: "min-h-screen flex items-center justify-center p-4",
+            div {
+                class: "w-80 max-w-full",
+                if authorized() {
+                    EvalView {},
+                } else {
+                    AuthView { authorized }
+                }
             }
         }
     }

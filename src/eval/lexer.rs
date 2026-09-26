@@ -43,16 +43,16 @@ impl fmt::Display for CalcError {
                 character,
             } => write!(
                 f,
-                "unexpected character {character:?} at position {position}"
+                "unexpected character {character:?}"
             ),
-            Self::InvalidNumber { position } => write!(f, "invalid number at position {position}"),
+            Self::InvalidNumber { position } => write!(f, "invalid number at position"),
             Self::EmptyExpression => write!(f, "empty expression"),
             Self::UnexpectedEnd => write!(f, "unexpected end of expression"),
             Self::UnexpectedToken { position } => {
-                write!(f, "unexpected token at index {position}")
+                write!(f, "unexpected token")
             }
             Self::ExpectedClosingBracket { position } => {
-                write!(f, "expected closing bracket at token index {position}")
+                write!(f, "expected closing bracket")
             }
             Self::DivisionByZero => write!(f, "division by zero"),
         }

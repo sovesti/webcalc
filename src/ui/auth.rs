@@ -27,14 +27,14 @@ pub fn AuthView(authorized: Signal<bool>) -> Element {
             div {
                 class: "flex flex-row",
                 button {
-                    class: "rounded-xl m-1 p-2 hover:bg-slate-200",
-                    class: if *tab.read() == Tab::SignIn { "bg-slate-100" },
+                    class: "rounded-xl m-1 px-4 py-2 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors",
+                    class: if *tab.read() == Tab::SignIn { "bg-blue-800" } else { "bg-blue-600" },
                     onclick: move |_| tab.set(Tab::SignIn),
                     "Sign in"
                 },
                 button {
-                    class: "rounded-xl m-1 p-2 hover:bg-slate-200",
-                    class: if *tab.read() == Tab::SignUp { "bg-slate-100" },
+                    class: "rounded-xl m-1 px-4 py-2 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors",
+                    class: if *tab.read() == Tab::SignUp { "bg-blue-800" } else { "bg-blue-600" },
                     onclick: move |_| tab.set(Tab::SignUp),
                     "Sign up"
                 }
@@ -69,7 +69,7 @@ fn SignInForm(authorized: Signal<bool>) -> Element {
                 value: password
             },
             button {
-                class: "rounded-xl m-1 p-2 hover:bg-slate-200",
+                class: "rounded-xl m-1 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors self-center",
                 onclick: move |_| signin.call(),
                 "Sign in"
             },
@@ -115,7 +115,7 @@ fn SignUpForm(authorized: Signal<bool>) -> Element {
                 value: password
             },
             button {
-                class: "rounded-xl m-1 p-2 hover:bg-slate-200",
+                class: "rounded-xl m-1 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors",
                 onclick: move |_| signup.call(),
                 "Sign up"
             },
