@@ -46,11 +46,19 @@ fn ExpressionView() -> Element {
                             "{result.read().result}"
                         }
                     },
-                    Err(_) => rsx! {
-                        p {
-                            class: "m-1 p-2",
-                            { "Internal server error" }
-                        }
+                    Err(err) => match err.0.downcast_ref::<ServerFnError>() {
+                        Some(ServerFnError::ServerError { code: 400, message, .. }) => rsx! {
+                            p {
+                                class: "m-1 p-2",
+                                "{message}"
+                            }
+                        },
+                        _ => rsx! {
+                            p {
+                                class: "m-1 p-2",
+                                { "Internal server error" }
+                            }
+                        },
                     },
                 }
             }
