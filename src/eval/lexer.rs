@@ -37,24 +37,21 @@ pub enum CalcError {
 impl fmt::Display for CalcError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::InvalidPosition { position } => write!(f, "invalid position {position}"),
+            Self::InvalidPosition { position } => write!(f, "Invalid position {position}"),
             Self::UnexpectedCharacter {
-                position,
+                position: _,
                 character,
-            } => write!(
-                f,
-                "unexpected character {character:?} at position {position}"
-            ),
-            Self::InvalidNumber { position } => write!(f, "invalid number at position {position}"),
-            Self::EmptyExpression => write!(f, "empty expression"),
-            Self::UnexpectedEnd => write!(f, "unexpected end of expression"),
-            Self::UnexpectedToken { position } => {
-                write!(f, "unexpected token at index {position}")
+            } => write!(f, "Unexpected character {character:?}"),
+            Self::InvalidNumber { position: _ } => write!(f, "Invalid number"),
+            Self::EmptyExpression => write!(f, "Empty expression"),
+            Self::UnexpectedEnd => write!(f, "Unexpected end of expression"),
+            Self::UnexpectedToken { position: _ } => {
+                write!(f, "Unexpected token")
             }
-            Self::ExpectedClosingBracket { position } => {
-                write!(f, "expected closing bracket at token index {position}")
+            Self::ExpectedClosingBracket { position: _ } => {
+                write!(f, "Expected closing bracket")
             }
-            Self::DivisionByZero => write!(f, "division by zero"),
+            Self::DivisionByZero => write!(f, "Division by zero"),
         }
     }
 }
