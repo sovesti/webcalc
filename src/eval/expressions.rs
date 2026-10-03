@@ -9,7 +9,11 @@ use super::EvaluatedExpression;
 #[async_trait]
 pub trait Expressions: Debug + Send + Sync + 'static {
     async fn history(&self, account_id: i32) -> Result<Vec<EvaluatedExpression>>;
-    async fn add_expression(&self, account_id: i32, expression: EvaluatedExpression) -> Result<EvaluatedExpression>;
+    async fn add_expression(
+        &self,
+        account_id: i32,
+        expression: EvaluatedExpression,
+    ) -> Result<EvaluatedExpression>;
 }
 
 pub type DynExpressions = Arc<dyn Expressions>;
@@ -29,7 +33,11 @@ impl Expressions for PgPool {
         .fetch_all(self)
         .await?)
     }
-    async fn add_expression(&self, account_id: i32, expression: EvaluatedExpression) -> Result<EvaluatedExpression> {
+    async fn add_expression(
+        &self,
+        account_id: i32,
+        expression: EvaluatedExpression,
+    ) -> Result<EvaluatedExpression> {
         Ok(query_as::<_, EvaluatedExpression>(
             r#"
             INSERT INTO evaluated_expression (account_id, expression, result)

@@ -9,3 +9,8 @@ pub async fn initialize_postgres(pool: &PgPool) -> anyhow::Result<()> {
         .await;
     Ok(())
 }
+
+pub async fn drop_tables(pool: &PgPool) -> anyhow::Result<()> {
+    pool.execute(include_str!("drop.sql")).await?;
+    Ok(())
+}
