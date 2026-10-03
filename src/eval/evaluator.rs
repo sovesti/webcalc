@@ -2,6 +2,7 @@ use crate::eval::{
     lexer::{CalcError, Operator, tokenize},
     parser::{Expr, UnaryOperator, parse},
 };
+use math::round;
 
 pub(crate) fn evaluate_expression(expression: &str) -> Result<f64, CalcError> {
     let tokens = tokenize(expression.to_owned())?;
@@ -37,7 +38,7 @@ fn evaluate_ast(expr: &Expr) -> Result<f64, CalcError> {
         }
     };
 
-    Ok(value)
+    Ok(round::floor(value, 6))
 }
 
 #[cfg(test)]
