@@ -23,18 +23,18 @@ pub fn AuthView(authorized: Signal<bool>) -> Element {
     let mut tab = use_signal(|| Tab::SignIn);
     rsx! {
         div {
-            class: "flex flex-col",
+            class: "flex flex-col w-1/3 min-w-60 justify-self-center",
             div {
                 class: "flex flex-row",
                 button {
-                    class: "rounded-xl m-1 px-4 py-2 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors",
-                    class: if *tab.read() == Tab::SignIn { "bg-blue-800" } else { "bg-blue-600" },
+                    class: "flex-1 rounded-m m-1 px-1 py-2 hover:bg-sky-100 cursor-pointer transition-colors",
+                    class: if *tab.read() == Tab::SignIn { "bg-sky-200" } else { "" },
                     onclick: move |_| tab.set(Tab::SignIn),
                     "Sign in"
                 },
                 button {
-                    class: "rounded-xl m-1 px-4 py-2 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors",
-                    class: if *tab.read() == Tab::SignUp { "bg-blue-800" } else { "bg-blue-600" },
+                    class: "flex-1 rounded-m m-1 px-1 py-2 hover:bg-sky-100 cursor-pointer transition-colors",
+                    class: if *tab.read() == Tab::SignUp { "bg-sky-200" } else { "" },
                     onclick: move |_| tab.set(Tab::SignUp),
                     "Sign up"
                 }
@@ -69,16 +69,14 @@ fn SignInForm(authorized: Signal<bool>) -> Element {
                 value: password
             },
             button {
-                class: "rounded-xl m-1 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors self-center",
+                class: "w-1/2 rounded-xl m-1 px-4 py-2 bg-sky-600 text-white hover:bg-sky-700 active:bg-sky-800 cursor-pointer transition-colors self-center",
                 onclick: move |_| signin.call(),
-                "Sign in"
+                disabled: signin.pending(),
+                if signin.pending() { "Checking..." } else { "Sign in" }
             },
             if let Some(Err(err)) = signin.value() {
                 p { "{readable_error(&err)}" }
             },
-            if signin.pending() {
-                p { "Checking..." }
-            }
         }
     }
 }
@@ -115,15 +113,13 @@ fn SignUpForm(authorized: Signal<bool>) -> Element {
                 value: password
             },
             button {
-                class: "rounded-xl m-1 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer transition-colors",
+                class: "w-1/2 rounded-xl m-1 px-4 py-2 bg-sky-600 text-white hover:bg-sky-700 active:bg-sky-800 cursor-pointer transition-colors self-center",
                 onclick: move |_| signup.call(),
-                "Sign up"
+                disabled: signup.pending(),
+                if signup.pending() { "Registering..." } else { "Sign up" }
             },
             if let Some(Err(err)) = signup.value() {
                 p { "{readable_error(&err)}" }
-            },
-            if signup.pending() {
-                p { "Registering..." }
             }
         }
     }
