@@ -53,19 +53,18 @@ pub async fn eval_history() -> Result<Vec<EvaluatedExpression>> {
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use async_trait::async_trait;       
-    use axum_test::{TestServer, TestResponse};
-    use serde_json::{json, to_value};
     use crate::backend::tests::Response;
+    use async_trait::async_trait;
+    use axum_test::{TestResponse, TestServer};
+    use serde_json::{json, to_value};
 
-    pub trait EvalHistoryResponse : Response {
+    pub trait EvalHistoryResponse: Response {
         fn assert_exact(&self, value: Vec<EvaluatedExpression>);
     }
 
     impl EvalHistoryResponse for TestResponse {
         fn assert_exact(&self, value: Vec<EvaluatedExpression>) {
-            self
-                .assert_status_ok()
+            self.assert_status_ok()
                 .assert_json(&to_value(value).unwrap());
         }
     }
@@ -80,7 +79,9 @@ pub mod tests {
     #[async_trait]
     impl Api for TestServer {
         async fn eval_expr(&self, expression: &str) -> TestResponse {
-            self.post("/eval").json(&json!({"expression": expression})).await
+            self.post("/eval")
+                .json(&json!({"expression": expression}))
+                .await
         }
 
         async fn eval_history(&self) -> impl EvalHistoryResponse {

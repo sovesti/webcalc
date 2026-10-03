@@ -35,21 +35,19 @@ pub async fn user_name() -> Result<String> {
 
 #[cfg(test)]
 pub mod tests {
-    use super::*;
-    use async_trait::async_trait;       
-    use axum_test::{TestServer, TestResponse};
-    use serde_json::{json, to_value};
     use crate::backend::tests::Response;
-    
-    pub trait UsernameResponse : Response {
+    use async_trait::async_trait;
+    use axum_test::{TestResponse, TestServer};
+    use serde_json::json;
+
+    pub trait UsernameResponse: Response {
         fn assert_exact(&self, value: &str);
     }
 
     #[async_trait]
     impl UsernameResponse for TestResponse {
         fn assert_exact(&self, value: &str) {
-            self
-                .assert_status_ok()
+            self.assert_status_ok()
                 .assert_json(&json!({"username": value}));
         }
     }
@@ -68,18 +66,16 @@ pub mod tests {
     #[async_trait]
     impl Api for TestServer {
         async fn sign_in(&self, username: &str, password: &str) -> impl Response {
-            self
-                .post("/user/signin")
+            self.post("/user/signin")
                 .json(&json! ({
                     "username": username,
                     "password": password
                 }))
                 .await
         }
-        
+
         async fn sign_up(&self, username: &str, password: &str) -> impl Response {
-            self
-                .post("/user/signup")
+            self.post("/user/signup")
                 .json(&json! ({
                     "username": username,
                     "password": password

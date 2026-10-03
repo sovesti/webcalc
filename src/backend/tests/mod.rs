@@ -3,10 +3,30 @@ mod eval;
 
 use super::test_router;
 
-use axum_test::{TestServer, TestResponse};
+use async_once::AsyncOnce;
+use axum_test::{TestResponse, TestServer};
+use lazy_static::lazy_static;
 
-pub async fn test_server() -> TestServer {
+use std::sync::{Mutex, MutexGuard};
+
+lazy_static! {
+    static ref TEST_SERVER: AsyncOnce<Mutex<TestServer>> =
+        AsyncOnce::new(async { Mutex::new(make_test_server().await) });
+}
+
+async fn make_test_server() -> TestServer {
+    println!("make test server");
     TestServer::new(test_router().await.unwrap())
+}
+
+pub async fn test_server<'a>() -> MutexGuard<'a, TestServer> {
+    // silence posion errors, because integration test threads will usually panic with locked
+    // test server mutex
+    TEST_SERVER
+        .get()
+        .await
+        .lock()
+        .map_or_else(|e| e.into_inner(), |ts| ts)
 }
 
 pub trait Response {
@@ -30,4 +50,3 @@ impl Response for TestResponse {
         self.assert_status_not_ok();
     }
 }
-

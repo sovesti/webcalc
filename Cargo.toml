@@ -26,6 +26,9 @@ tower-http = { version = "0.7.1", optional = true }
 [dev-dependencies]
 axum-test = "21.1.0"
 serial_test = "4.0.1"
+lazy_static = "1.5.0"
+async_once = "0.2.6"
+time-test = "0.3"
 
 [features]
 web = ["dioxus/web"]

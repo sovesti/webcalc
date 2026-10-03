@@ -243,6 +243,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "async_once"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ce4f10ea3abcd6617873bae9f91d1c5332b4a778bd9ce34d0cd517474c1de82"
+
+[[package]]
 name = "atk"
 version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6700,6 +6706,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "time-test"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ff3804c6adc3d7a9f51586d6a47f7e57e173b9a2d257679deeb6d686d2698073"
+dependencies = [
+ "time",
+]
+
+[[package]]
 name = "tiny-keccak"
 version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7486,6 +7501,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "async_once",
  "axum",
  "axum-test",
  "axum_session",
@@ -7494,11 +7510,13 @@ dependencies = [
  "config",
  "dioxus",
  "http",
+ "lazy_static",
  "password-auth",
  "serde",
  "serde_json",
  "serial_test",
  "sqlx",
+ "time-test",
  "tokio",
  "toml 1.1.5+spec-1.1.0",
  "tower",

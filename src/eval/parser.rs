@@ -1,6 +1,5 @@
 use crate::eval::lexer::{BracketType, CalcError, Operator, Token};
 
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum UnaryOperator {
     Plus,
@@ -44,7 +43,6 @@ struct Parser<'a> {
 
 impl Parser<'_> {
     fn parse_expression(&mut self, min_binding_power: u8) -> Result<Expr, CalcError> {
-
         let mut left = self.parse_prefix()?;
 
         loop {

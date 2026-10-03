@@ -4,7 +4,7 @@ use anyhow::{Context, anyhow, ensure};
 use serde::Deserialize;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Config {
     postgres: PostgresConfig,
 }
@@ -23,8 +23,7 @@ impl Config {
 }
 
 fn config_path() -> anyhow::Result<String> {
-    let path = "config.toml".to_owned();//env::args().nth(1).unwrap_or("config.toml".to_owned());
-    println!("{} {}", env::current_dir().unwrap().display(), &path);
+    let path = "config.toml".to_owned(); //env::args().nth(1).unwrap_or("config.toml".to_owned());
     ensure!(
         exists(&path).is_ok_and(|exists| exists),
         "Config file not found at {path}"
@@ -32,7 +31,7 @@ fn config_path() -> anyhow::Result<String> {
     Ok(path)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct PostgresConfig {
     user: String,
     password: String,
